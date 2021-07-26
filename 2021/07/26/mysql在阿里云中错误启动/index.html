@@ -15,7 +15,7 @@
 
 
 
-<title>My New Post | 郑朝文个人博客</title>
+<title>mysql在阿里云中错误启动 | 郑朝文个人博客</title>
 
 
 
@@ -195,7 +195,7 @@
     
     <article class="post-wrap">
         <header class="post-header">
-            <h1 class="post-title">My New Post</h1>
+            <h1 class="post-title">mysql在阿里云中错误启动</h1>
             
                 <div class="post-meta">
                     
@@ -204,16 +204,28 @@
 
                     
                         <span class="post-time">
-                        Date: <a href="#">七月 14, 2021&nbsp;&nbsp;16:19:18</a>
+                        Date: <a href="#">七月 26, 2021&nbsp;&nbsp;12:19:59</a>
                         </span>
                     
+                    
+                        <span class="post-category">
+                    Category:
+                            
+                                <a href="/categories/%E9%98%BF%E9%87%8C%E4%BA%91/">阿里云</a>
+                            
+                        </span>
                     
                 </div>
             
         </header>
 
         <div class="post-content">
-            <h2 id="你好"><a href="#你好" class="headerlink" title="你好"></a>你好</h2><p>这是我的第一个博客</p>
+            <h2 id="今天在阿里云启动MySQL的时候突然启动不了"><a href="#今天在阿里云启动MySQL的时候突然启动不了" class="headerlink" title="今天在阿里云启动MySQL的时候突然启动不了"></a>今天在阿里云启动MySQL的时候突然启动不了</h2><p>报的错误是</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">MySQL server PID file could not be found!                  [FAILED]</span><br><span class="line">Starting MySQL......./usr/<span class="built_in">local</span>/mysql/bin/mysqld_safe: line 199: 20203 Killed                  env MYSQLD_PARENT_PID=19962 nohup /usr/<span class="built_in">local</span>/mysql/bin/mysqld --basedir=/usr/<span class="built_in">local</span>/mysql --datadir=/usr/<span class="built_in">local</span>/mysql/data --plugin-dir=/usr/<span class="built_in">local</span>/mysql/lib/plugin --user=mysql --log-error=hadoop100.err --pid-file=/usr/<span class="built_in">local</span>/mysql/data/hadoop100.pid --port=3306 &lt; /dev/null &gt; /dev/null 2&gt;&amp;1</span><br><span class="line">.The server quit without updating PID file (/usr/<span class="built_in">local</span>/mysq[FAILED]adoop100.pid).</span><br></pre></td></tr></table></figure>
+<p>最后查看MySQL的错误日志发现有以下错误</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">2021-07-26T02:26:21.360412Z 0 [System] [MY-010116] [Server] /usr/<span class="built_in">local</span>/mysql/bin/mysqld (mysqld 8.0.23) starting as process 31601</span><br><span class="line">2021-07-26T02:26:22.248132Z 0 [Warning] [MY-013242] [Server] --character-set-server: <span class="string">&#x27;utf8&#x27;</span> is currently an <span class="built_in">alias</span> <span class="keyword">for</span> the character <span class="built_in">set</span> UTF8MB3, but will be an <span class="built_in">alias</span> <span class="keyword">for</span> UTF8MB4 <span class="keyword">in</span> a future release. Please consider using UTF8MB4 <span class="keyword">in</span> order to be unambiguous.</span><br><span class="line">2021-07-26T02:26:31.268827Z 1 [System] [MY-013576] [InnoDB] InnoDB initialization has started.</span><br><span class="line">2021-07-26T02:26:40.369081Z 0 [ERROR] [MY-012681] [InnoDB] mmap(136970240 bytes) failed; errno 12</span><br><span class="line">2021-07-26T02:26:41.181295Z 1 [ERROR] [MY-012956] [InnoDB] Cannot allocate memory <span class="keyword">for</span> the buffer pool</span><br><span class="line">2021-07-26T02:26:41.181440Z 1 [ERROR] [MY-012930] [InnoDB] Plugin initialization aborted with error Generic error.</span><br><span class="line">2021-07-26T02:26:41.204155Z 1 [ERROR] [MY-010334] [Server] Failed to initialize DD Storage Engine</span><br><span class="line">2021-07-26T02:26:42.239159Z 0 [ERROR] [MY-010020] [Server] Data Dictionary initialization failed.</span><br></pre></td></tr></table></figure>
+<p>这个错误是因为阿里云的机器的内存不够，清理内存，然后重新启动MySQL就可以<br>重启MySQL服务的命令</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ service mysql restart </span><br></pre></td></tr></table></figure>
 
         </div>
 
@@ -228,7 +240,7 @@
                 
                     <p class="copyright-item">
                         <span>Permalink:</span>
-                        <span><a href="http://www.zzwaizmm.fit/2021/07/14/My-New-Post/">http://www.zzwaizmm.fit/2021/07/14/My-New-Post/</a></span>
+                        <span><a href="http://www.zzwaizmm.fit/2021/07/26/mysql%E5%9C%A8%E9%98%BF%E9%87%8C%E4%BA%91%E4%B8%AD%E9%94%99%E8%AF%AF%E5%90%AF%E5%8A%A8/">http://www.zzwaizmm.fit/2021/07/26/mysql%E5%9C%A8%E9%98%BF%E9%87%8C%E4%BA%91%E4%B8%AD%E9%94%99%E8%AF%AF%E5%90%AF%E5%8A%A8/</a></span>
                     </p>
                 
                 
@@ -251,6 +263,10 @@
                 <span>Tag(s):</span>
                 <span class="tag">
                     
+                    
+                        <a href="/tags/mysql/"># mysql</a>
+                    
+                        
                 </span>
             </div>
             <div>
@@ -261,10 +277,8 @@
         </section>
         <section class="post-nav">
             
-                <a class="prev" rel="prev" href="/2021/07/26/mysql%E5%9C%A8%E9%98%BF%E9%87%8C%E4%BA%91%E4%B8%AD%E9%94%99%E8%AF%AF%E5%90%AF%E5%8A%A8/">mysql在阿里云中错误启动</a>
             
-            
-            <a class="next" rel="next" href="/2021/07/14/hello-world/">Hello World</a>
+            <a class="next" rel="next" href="/2021/07/14/My-New-Post/">My New Post</a>
             
         </section>
 
