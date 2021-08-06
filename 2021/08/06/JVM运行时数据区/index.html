@@ -15,7 +15,7 @@
 
 
 
-<title>Hello World | 郑朝文个人博客</title>
+<title>JVM运行时数据区 | 郑朝文个人博客</title>
 
 
 
@@ -195,7 +195,7 @@
     
     <article class="post-wrap">
         <header class="post-header">
-            <h1 class="post-title">Hello World</h1>
+            <h1 class="post-title">JVM运行时数据区</h1>
             
                 <div class="post-meta">
                     
@@ -204,7 +204,7 @@
 
                     
                         <span class="post-time">
-                        Date: <a href="#">七月 14, 2021&nbsp;&nbsp;16:10:13</a>
+                        Date: <a href="#">八月 6, 2021&nbsp;&nbsp;18:36:18</a>
                         </span>
                     
                     
@@ -213,19 +213,18 @@
         </header>
 
         <div class="post-content">
-            <p>Welcome to <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a target="_blank" rel="noopener" href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a target="_blank" rel="noopener" href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a target="_blank" rel="noopener" href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/writing.html">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/server.html">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/generating.html">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
+            <h2 id="JVM运行时数据区"><a href="#JVM运行时数据区" class="headerlink" title="JVM运行时数据区"></a>JVM运行时数据区</h2><ul>
+<li>概述<blockquote>
+<p><img src="https://tjiseedu.oss-cn-beijing.aliyuncs.com/%E5%8D%9A%E5%AE%A2/%E8%BF%90%E8%A1%8C%E6%97%B6%E6%95%B0%E6%8D%AE%E5%8C%BA.png" alt="运行时数据区"></p>
+</blockquote>
+</li>
+<li>内存是非常重要的系统资源，是硬盘和CPU的中间仓库及桥梁，承载着操作系统和应用程序的实时运行。JVM内存布局规定了Java在运行过程中的内存申请、分配、管理的策略，保证了JVM的高效稳定运行。不同的JVM对于内存的划分方式和管理机制存在着部分差异（我们以HotSpot虚拟机来展开）</li>
+<li><img src="https://tjiseedu.oss-cn-beijing.aliyuncs.com/%E5%8D%9A%E5%AE%A2/%E8%BF%90%E8%A1%8C%E6%97%B6%E6%95%B0%E6%8D%AE%E5%8C%BA2.png" alt="运行时数据区2"><blockquote>
+<p>灰色区域为单独线程私有的，红色的为多个线程共享的。即每个线程独立包括程序计数器、栈、本地栈。线程间共享：堆、堆外内存（永久代或元空间、代码缓存）。</p>
+</blockquote>
+</li>
+<li>Java虚拟机定义了若干个程序运行期间会使用到的运行时数据区，其中有一些会随着虚拟机启动而创建，随着虚拟机退出而销毁，另外一些则是与线程一一对应的，这些与线程对应的数据区域会随着线程开始和结束而创建和销毁</li>
+</ul>
 
         </div>
 
@@ -240,7 +239,7 @@
                 
                     <p class="copyright-item">
                         <span>Permalink:</span>
-                        <span><a href="http://www.zzwaizmm.fit/2021/07/14/hello-world/">http://www.zzwaizmm.fit/2021/07/14/hello-world/</a></span>
+                        <span><a href="http://www.zzwaizmm.fit/2021/08/06/JVM%E8%BF%90%E8%A1%8C%E6%97%B6%E6%95%B0%E6%8D%AE%E5%8C%BA/">http://www.zzwaizmm.fit/2021/08/06/JVM%E8%BF%90%E8%A1%8C%E6%97%B6%E6%95%B0%E6%8D%AE%E5%8C%BA/</a></span>
                     </p>
                 
                 
@@ -263,6 +262,10 @@
                 <span>Tag(s):</span>
                 <span class="tag">
                     
+                    
+                        <a href="/tags/JVM/"># JVM</a>
+                    
+                        
                 </span>
             </div>
             <div>
@@ -273,8 +276,8 @@
         </section>
         <section class="post-nav">
             
-                <a class="prev" rel="prev" href="/2021/07/14/My-New-Post/">My New Post</a>
             
+            <a class="next" rel="next" href="/2021/07/26/mysql%E5%9C%A8%E9%98%BF%E9%87%8C%E4%BA%91%E4%B8%AD%E9%94%99%E8%AF%AF%E5%90%AF%E5%8A%A8/">mysql在阿里云中错误启动</a>
             
         </section>
 
