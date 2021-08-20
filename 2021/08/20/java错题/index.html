@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="郑朝文">
+
+
+
+    <meta name="description" content="学无止境">
+
+
+
+<title>java错题 | 郑朝文个人博客</title>
+
+
+
+    <link rel="icon" href="/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const currentTheme = window.localStorage && window.localStorage.getItem('theme') || '';
+            const isDark = currentTheme === 'dark';
+            const pagebody = document.getElementsByTagName('body')[0]
+            if (isDark) {
+                pagebody.classList.add('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Dark"
+            } else {
+                pagebody.classList.remove('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Light"
+            }
+        })();
+    </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">ZhengZhaoWen&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">ZhengZhaoWen&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    document.ready(
+        function () {
+            tocbot.init({
+                tocSelector: '.tocbot-list',
+                contentSelector: '.post-content',
+                headingSelector: 'h1, h2, h3, h4, h5',
+                collapseDepth: 1,
+                orderedList: false,
+                scrollSmooth: true,
+            })
+        }
+    )
+
+    function expand_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 6,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "collapse_toc()");
+        b.innerHTML = "Collapse all"
+    }
+
+    function collapse_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 1,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "expand_toc()");
+        b.innerHTML = "Expand all"
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">java错题</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">郑朝文</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">八月 20, 2021&nbsp;&nbsp;12:10:13</a>
+                        </span>
+                    
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h1 id="错题一-i的值输出是多少"><a href="#错题一-i的值输出是多少" class="headerlink" title="错题一 i的值输出是多少"></a>错题一 i的值输出是多少</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@program</span>: JVMDemo</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@description</span>: test</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span>: 郑朝文</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@create</span>: 2021-08-20 11:59</span></span><br><span class="line"><span class="comment"> **/</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ErrorTest</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        ErrorTest inc = <span class="keyword">new</span> ErrorTest();</span><br><span class="line">        <span class="keyword">int</span> i = <span class="number">0</span>;</span><br><span class="line">        inc.fermin(i);</span><br><span class="line">        i= i ++;</span><br><span class="line">        System.out.println(i);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">fermin</span><span class="params">(<span class="keyword">int</span> i)</span> </span>&#123;</span><br><span class="line">        i++;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>解析 根据字节码指令来进行分析<br>Java虚拟机栈（JVM Stack）描述的是Java方法执行的内存模型，而JVM内存模型是基于“栈帧”的，每个栈帧中都有 局部变量表 和 操作数栈 （还有动态链接、return address等），那么JVM是如何执行这个语句的呢？通过javap大致可以将上面的两行代码翻译成如下的JVM指令执行代码。</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"> <span class="number">0</span> <span class="keyword">new</span> #<span class="number">2</span> &lt;com/yi/ErrorTest&gt;</span><br><span class="line"> <span class="number">3</span> dup</span><br><span class="line"> <span class="number">4</span> invokespecial #<span class="number">3</span> &lt;com/yi/ErrorTest.&lt;init&gt; : ()V&gt;</span><br><span class="line"> <span class="number">7</span> astore_1</span><br><span class="line"> <span class="number">8</span> iconst_0</span><br><span class="line"> <span class="number">9</span> istore_2</span><br><span class="line"><span class="number">10</span> aload_1</span><br><span class="line"><span class="number">11</span> iload_2</span><br><span class="line"><span class="number">12</span> invokevirtual #<span class="number">4</span> &lt;com/yi/ErrorTest.fermin : (I)V&gt;</span><br><span class="line"><span class="number">15</span> iload_2</span><br><span class="line"><span class="number">16</span> iinc <span class="number">2</span> by <span class="number">1</span></span><br><span class="line"><span class="number">19</span> istore_2</span><br><span class="line"><span class="number">20</span> getstatic #<span class="number">5</span> &lt;java/lang/System.out : Ljava/io/PrintStream;&gt;</span><br><span class="line"><span class="number">23</span> iload_2</span><br><span class="line"><span class="number">24</span> invokevirtual #<span class="number">6</span> &lt;java/io/PrintStream.println : (I)V&gt;</span><br><span class="line"><span class="number">27</span> <span class="keyword">return</span></span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>我们从第 8 行进行分析，这个是主要的部分<br>第8 : 将int类型的0入栈，就是放到操作数栈顶<br>第9 ： 将操作数栈顶的值0弹出，保存到局部变量表index值为2的位置。（该方法是类方法所以index0的位置不会保存this，方法内公有三个参数 （args，inc，i））<br>第10 ：将index1位置的引用类型推入栈顶<br>第11 ：将局部变量表中index 2 位置的值的副本入栈（栈顶的值为0）<br>第12 ： 进行方法调用<br>第15 ：将局部变量表中index 2 位置的值的副本入栈（栈顶的值为0）<br>第16 ：iinc是对int类型的值进行自增操作，后面第一个数值2 表示，局部变量表中的index 值，说明要对此值进行iinc操作，第二个数值1表示要增加的数值(这是局部变量表index为2的值因为执行了自增操作变为1了，但是操作数栈中栈顶的值仍然是0)<br>第19 ： 将操作数栈顶的值弹出（值0），放到局部变量表index为2的位置（旧值：1，新值 ：0），覆盖了上一步局部变量表的计算结果<br>总结在第9和第19执行了2次将0赋值给变量i的操作（=号赋值），i++操作时在这两次操作之间执行，自增操作是对局部变量表中的值进行自增，而栈顶的值没有发生变化，这里需要注意的是保存这个初始值的地方是操作数栈而不是局部变量表，最后再将栈顶的值覆盖到局部变量表i所在的索引位置中去。</p>
+</blockquote>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>郑朝文</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="http://www.zzwaizmm.fit/2021/08/20/java%E9%94%99%E9%A2%98/">http://www.zzwaizmm.fit/2021/08/20/java%E9%94%99%E9%A2%98/</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2019 <a target="_blank" rel="noopener" href="http://creativecommons.org/licenses/by-nc/4.0/">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+                     <p class="copyright-item">
+                         <span>Slogan:</span>
+                         <span>Do you believe in <strong>DESTINY</strong>?</span>
+                     </p>
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/Java%E9%94%99%E9%A2%98/"># Java错题</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+            
+            <a class="next" rel="next" href="/2021/08/06/JVM%E8%BF%90%E8%A1%8C%E6%97%B6%E6%95%B0%E6%8D%AE%E5%8C%BA/">JVM运行时数据区</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© 郑朝文 | Powered by <a href="https://beian.miit.gov.cn/" target="_blank">晋ICP备2021011253号</a>
+    </div>
+</footer>
+
+    </div>
+</body>
+
+</html>
