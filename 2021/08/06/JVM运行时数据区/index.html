@@ -494,7 +494,7 @@
 </ul>
 </li>
 <li>2、在方法执行的过程中遇到了异常（Exception），并且这个异常没有在方法内进行处理，也就是只要在本方法的异常表中没有搜索到匹配的异常处理器，就会导致方法退出。简称异常完成出口。<ul>
-<li>方法执行过程中抛出异常时的异常处理，存储在一个异常处理表，方便在发生异常的时候找到处理异常的代码。<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">Exception table:</span><br><span class="line">      from    to  target type</span><br><span class="line">          <span class="number">0</span>     <span class="number">4</span>     <span class="number">7</span>   Class java/io/FileNotFoundException</span><br></pre></td></tr></table></figure>
+<li>方法执行过程中抛出异常时的异常处理，存储在一个异常处理表，方便在发生异常的时候找到处理异常的代码。<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">Exception table:</span><br><span class="line">from    to  target type</span><br><span class="line"><span class="number">0</span>     <span class="number">4</span>     <span class="number">7</span>   Class java/io/FileNotFoundException</span><br></pre></td></tr></table></figure>
 <blockquote>
 <p>本质上，方法的退出就是当前栈帧出栈的过程。此时，需要恢复上层方法的局部变量表、操作数栈、将放回值压入调用者栈帧的操作数栈、设置PC寄存器值等，让调用者方法继续执行下去。</p>
 </blockquote>
@@ -505,6 +505,81 @@
 <blockquote>
 <p>正常完成出口和异常完成出口的区别在于：通过异常完成出口退出的不会给他的上层调用者产生任何的返回值。</p>
 </blockquote>
+<h2 id="本地方法接口"><a href="#本地方法接口" class="headerlink" title="本地方法接口"></a>本地方法接口</h2><p><img src="https://tjiseedu.oss-cn-beijing.aliyuncs.com/%E5%8D%9A%E5%AE%A2/%E6%9C%AC%E5%9C%B0%E6%96%B9%E6%B3%95%E6%8E%A5%E5%8F%A3.png" alt="本地方法接口"></p>
+<blockquote>
+<p>什么是本地方法接口<br>简单地来将，<strong>一个Native Method就是一个Java调用非Java代码的接口。</strong>一个Native Method是这样一个Java方法，该方法的实现有非Java语言实现，比如C，这个特征并非Java所有，很多其他的编程语言都有这个机制，比如在C++中，你可以用extern “C” 告知c++编译期去调用一个C的函数。</p>
+</blockquote>
+<p>“A Native method is a Java method whose implementation is provied by non-java code.”<br>在定义一个native method时，并不提供实现体（有些像定义一个Java interface），因为实现体是有非java语言在外面实现的。</p>
+<p>本地接口的作用是融合不同的编程语言为Java所用，它的初衷是融合c/c++程序。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">IHaveNatives</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">native</span> <span class="keyword">void</span> <span class="title">methodNative1</span><span class="params">(<span class="keyword">int</span> x)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">native</span> <span class="keyword">static</span> <span class="keyword">long</span> <span class="title">methodNative2</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">native</span> <span class="keyword">synchronized</span> <span class="keyword">float</span> <span class="title">methodNative3</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">native</span>  <span class="keyword">void</span> <span class="title">method4</span><span class="params">(<span class="keyword">int</span> [] ary)</span> <span class="keyword">throws</span> java.lang.Exception</span>;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>标识符native可以与所有其它的java标识符连用，但是abstract除外。</p>
+</blockquote>
+<blockquote>
+<p>为什么使用native method？<br>Java 使用起来非常方便，然而有些层次的任务用Java实现起来不是很容易，或者我们对程序的效率很在意时，问题就来了。</p>
+</blockquote>
+<ul>
+<li>与Java环境外交互：<br>有时Java应用需要与Java外面的环境交互，这是本地方法存在的主要原因。你可以想想Java需要与一些底层系统，如操作系统或某些硬件交换信息时的情况。本地方法正是这样一种交流机制：它为我们提供了一个非常简洁的接口，而且我们无需去了解Java应用之外的繁琐的细节</li>
+<li>与操作系统交互<br>JVM支持者Java语言本身和运行时库，它是Java程序赖以生存的平台，它由一个解释器（解释字节码）和一些连接到本地代码的库组成。然而不管怎么样，他毕竟不是一个完整的系统，他经常依赖于一些底层系统的支持。这些底层系统常常是强大的操作系统。通过使用本地方法，我们得以用Java实现了jre的与底层系统的交互，甚至JVM的一些部分就是用C写的。还有，如果我们要使用一些Java语言本身没有提供封装的操作系统的特性时，我们也需要使用本地方法。</li>
+<li>Sun’s Java<br>Sun的解释器是用C实现的，这使得它能像一些普通的C一样与外部交互。jre大部分使用Java实现的，它也通过一些本地方法与外界交互。例如：类java.lang.Thread的setPriority()方法是用Java实现的，但是它实现调用的是该类中的本地方法setPriority0().这个方法使用C实现的，并被植入JVM内部，在windows 95 的平台上，这个本地方法最终将调用Win 32 SetPriority() API。这是一个本地方法的具体实现有JVM直接提供，更多的情况是本地方法由外部的动态链接库(external dynamic link library)提供,然后被JVM调用。</li>
+</ul>
+<h2 id="本地方法栈（Native-Method-Stack）"><a href="#本地方法栈（Native-Method-Stack）" class="headerlink" title="本地方法栈（Native Method Stack）"></a>本地方法栈（Native Method Stack）</h2><ul>
+<li><p>Java虚拟机栈用于管理Java方法的调用，而本地方法栈用于管理本地方法的嗲用。</p>
+</li>
+<li><p>本地方法栈，也是线程私有的。</p>
+</li>
+<li><p>允许被实现成固定或者是可动态扩展的内存大小（在内存溢出方面是相同的）</p>
+<ul>
+<li>如果线程请求分配的栈容量超过本地方法栈允许的最大容量，Java虚拟机将会抛出一个StackOverflowError异常。</li>
+<li>如果本地方法栈可以动态扩展，并且在尝试扩展的时候无法申请到足够的内存，或者在创建新的线程时没有足够的内存去创建对应的本地方法栈，那么Java虚拟机将会抛出一个 OutOfMemoryError异常。</li>
+</ul>
+</li>
+<li><p>本地方法是使用C语言实现的。</p>
+</li>
+<li><p>它的具体做法是Native Method Stack中登记的native方法，在Execution Engine 执行时加载本地方法库。<br><img src="https://tjiseedu.oss-cn-beijing.aliyuncs.com/%E5%8D%9A%E5%AE%A2/%E6%9C%AC%E5%9C%B0%E6%96%B9%E6%B3%95%E6%A0%88.png" alt="本地方法栈"></p>
+</li>
+<li><p>当某个线程调用一个本地方法时，它就进入一个全新的并且不再受虚拟机限制的世界。它和虚拟机拥有同样的权限。</p>
+<ul>
+<li>本地方法可以通过本地方法接口来访问虚拟机内部的运行时数据区。</li>
+<li>它甚至可以直接使用本地处理器中的寄存器</li>
+<li>直接从本地内存的堆中分配任意数量的内存。</li>
+</ul>
+</li>
+<li><p>并不是所有的JVM都支持本地方法。因为Java虚拟机规范并没有明确要求本地方法栈的使用语言、具体实现方式、数据结构等。如果JVM产品不打算支持native方法，也可以无需要实现本地方法栈。</p>
+</li>
+<li><p>在Hotspot JVM中，直接将本地方法栈和虚拟机栈合二为一。</p>
+</li>
+</ul>
+<h2 id="堆"><a href="#堆" class="headerlink" title="堆"></a>堆</h2><p><img src="https://tjiseedu.oss-cn-beijing.aliyuncs.com/%E5%8D%9A%E5%AE%A2/%E5%A0%86%E7%9A%84%E5%BC%80%E5%A7%8B.png" alt="堆的开始"></p>
+<h3 id="堆-Heap-的核心概述"><a href="#堆-Heap-的核心概述" class="headerlink" title="堆(Heap)的核心概述"></a>堆(Heap)的核心概述</h3><ul>
+<li>一个JVM实例只存在一个堆内存，对也是Java内存管理的核心区域。</li>
+<li>Java堆区在JVM启动的时候即被创建，其空间大小也就确定了。是JVM管理的最大一块内存空间。<ul>
+<li>堆内存的大小是可以调节的。</li>
+</ul>
+</li>
+<li>《Java虚拟机规范》规定，堆可以处于物理上不连续的空间中，但在逻辑上它应该被视为连续的。</li>
+<li>所有的线程共享Java堆，在这里还可以划分为线程私有的缓冲区（Thread Local Allocation Buffer，TLAB）。</li>
+<li>《Java虚拟机规范》中对Java堆的描述是：所有的对象实例以及数组都应当在运行时分配在堆上。（The heap is the run-time data area from which memory for all class instances and arrays is allocated）<ul>
+<li>我要说的是：“几乎”所有的对象实例都在这里分配内存。—从实际使用角度看的</li>
+</ul>
+</li>
+<li>数组和对象可能永远不会存储在栈上，因为栈帧中保存引用，这个引用指向对象或者数组在堆中的位置。</li>
+<li>在方法结束后，堆中的对象不会马上被移除，仅仅在垃圾收集的时候才会被移除。</li>
+<li>堆，是GC（Garbage Collection，垃圾收集器）执行垃圾回收的重点区域<br><img src="https://tjiseedu.oss-cn-beijing.aliyuncs.com/%E5%8D%9A%E5%AE%A2/%E5%A0%86%E7%9A%84%E6%A0%B8%E5%BF%83%E6%A6%82%E8%BF%B0.png" alt="堆的核心概述"><h4 id="内存细节"><a href="#内存细节" class="headerlink" title="内存细节"></a>内存细节</h4>现代垃圾收集器大部分都基于分代收集理论设计，堆空间分为：<br><img src="https://tjiseedu.oss-cn-beijing.aliyuncs.com/%E5%8D%9A%E5%AE%A2/%E5%A0%86%E7%9A%84%E5%86%85%E5%AD%98%E7%BB%86%E8%8A%82.png" alt="堆的内存细节"><blockquote>
+<p>JDK 7 的堆内存<br><img src="https://tjiseedu.oss-cn-beijing.aliyuncs.com/%E5%8D%9A%E5%AE%A2/JDK7%E5%A0%86%E5%86%85%E5%AD%98.png" alt="JDK7的堆内存"><br>JDK 8 的堆内存<br><img src="https://tjiseedu.oss-cn-beijing.aliyuncs.com/%E5%8D%9A%E5%AE%A2/JDK8%E5%A0%86%E5%86%85%E5%AD%98.png" alt="JDK8的堆内存"></p>
+</blockquote>
+<h2 id="堆内存的大小与OOM"><a href="#堆内存的大小与OOM" class="headerlink" title="堆内存的大小与OOM"></a>堆内存的大小与OOM</h2></li>
+<li>Java堆区用于存储Java对象实例，那么堆的大小在JVM启动时就已经设定好了，大家可以通过选项”-Xmx”和”-Xms”来进行设置。<ul>
+<li>“-Xms”用于表示堆区的起始内存，等价于-XX:InitialHeapSize</li>
+<li>“-Xmx”用于表示堆区的最大内存，等价于-XX:MaxHeapSize</li>
+</ul>
+</li>
+<li>一旦堆区中的内存大小超过”-Xmx”所指定的最大内存时，将会抛出OutOfMemoryError异常。</li>
+<li>通常会将 -Xms和-Xmx两个参数配置相同的值，其目的是为了能够在Java垃圾回收机制清理完堆区后不需要重新分隔计算堆区的大小，从而提高性能</li>
+<li>默认情况下，初始内存大小：物理电脑内存大小/64</li>
+<li>最大内存：物理电脑内存大小/4<h3 id="OutOfMemory-举例"><a href="#OutOfMemory-举例" class="headerlink" title="OutOfMemory 举例"></a>OutOfMemory 举例</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@program</span>: JVMDemo</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@description</span>: etst</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span>: 郑朝文</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@create</span>: 2021-08-21 19:53</span></span><br><span class="line"><span class="comment"> **/</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">OOM</span></span>&#123;</span><br><span class="line">    <span class="keyword">byte</span>[] ll ;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">OOM</span><span class="params">()</span></span>&#123;&#125;;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">OOM</span><span class="params">(<span class="keyword">int</span> length)</span></span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.ll=<span class="keyword">new</span> <span class="keyword">byte</span>[length];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">OOMTest</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        ArrayList&lt;OOM&gt; arrayList = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">        <span class="keyword">while</span> (<span class="keyword">true</span>)&#123;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                Thread.sleep(<span class="number">20</span>);</span><br><span class="line">            &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">                e.printStackTrace();</span><br><span class="line">            &#125;</span><br><span class="line">            arrayList.add(<span class="keyword">new</span> OOM(<span class="keyword">new</span> Random().nextInt(<span class="number">1024</span>*<span class="number">1024</span>)));</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<img src="https://tjiseedu.oss-cn-beijing.aliyuncs.com/%E5%8D%9A%E5%AE%A2/OOM%E5%A0%86%E5%86%85%E5%AD%98%E6%BA%A2%E5%87%BA.png" alt="堆内存的溢出"></li>
+</ul>
 
         </div>
 
