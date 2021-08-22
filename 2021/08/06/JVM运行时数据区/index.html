@@ -578,7 +578,114 @@
 <li>通常会将 -Xms和-Xmx两个参数配置相同的值，其目的是为了能够在Java垃圾回收机制清理完堆区后不需要重新分隔计算堆区的大小，从而提高性能</li>
 <li>默认情况下，初始内存大小：物理电脑内存大小/64</li>
 <li>最大内存：物理电脑内存大小/4<h3 id="OutOfMemory-举例"><a href="#OutOfMemory-举例" class="headerlink" title="OutOfMemory 举例"></a>OutOfMemory 举例</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@program</span>: JVMDemo</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@description</span>: etst</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span>: 郑朝文</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@create</span>: 2021-08-21 19:53</span></span><br><span class="line"><span class="comment"> **/</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">OOM</span></span>&#123;</span><br><span class="line">    <span class="keyword">byte</span>[] ll ;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">OOM</span><span class="params">()</span></span>&#123;&#125;;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">OOM</span><span class="params">(<span class="keyword">int</span> length)</span></span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.ll=<span class="keyword">new</span> <span class="keyword">byte</span>[length];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">OOMTest</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        ArrayList&lt;OOM&gt; arrayList = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">        <span class="keyword">while</span> (<span class="keyword">true</span>)&#123;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                Thread.sleep(<span class="number">20</span>);</span><br><span class="line">            &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">                e.printStackTrace();</span><br><span class="line">            &#125;</span><br><span class="line">            arrayList.add(<span class="keyword">new</span> OOM(<span class="keyword">new</span> Random().nextInt(<span class="number">1024</span>*<span class="number">1024</span>)));</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-<img src="https://tjiseedu.oss-cn-beijing.aliyuncs.com/%E5%8D%9A%E5%AE%A2/OOM%E5%A0%86%E5%86%85%E5%AD%98%E6%BA%A2%E5%87%BA.png" alt="堆内存的溢出"></li>
+<img src="https://tjiseedu.oss-cn-beijing.aliyuncs.com/%E5%8D%9A%E5%AE%A2/OOM%E5%A0%86%E5%86%85%E5%AD%98%E6%BA%A2%E5%87%BA.png" alt="堆内存的溢出"><h3 id="年轻代与老年代"><a href="#年轻代与老年代" class="headerlink" title="年轻代与老年代"></a>年轻代与老年代</h3></li>
+<li>存储在JVM中的Java对象可以被划分为两类：<ul>
+<li>一类是生命周期较短的瞬时对象，这类对象的创建和消亡都非常迅速。</li>
+<li>另外一类对象的生命周期却非常长，在某些极端的情况下还能够与JVM的生命周期保持一致</li>
+</ul>
+</li>
+<li>Java堆区进一步细分的话，可以划分为年轻代（YoungGen）和老年代（OldGen）</li>
+<li>其中年轻代又可以划分为Eden空间、Survivor0空间和Survivor1空间（有时也叫作from区、to区）。<br><img src="https://tjiseedu.oss-cn-beijing.aliyuncs.com/%E5%8D%9A%E5%AE%A2/%E5%B9%B4%E8%BD%BB%E4%BB%A3%E4%B8%8E%E8%80%81%E5%B9%B4%E4%BB%A3.png" alt="年轻代与老年代"><br>下面这些参数一般不会调<br><img src="https://tjiseedu.oss-cn-beijing.aliyuncs.com/%E5%8D%9A%E5%AE%A2/%E5%8F%82%E6%95%B0%E4%B8%80%E8%88%AC%E4%B8%8D%E4%BC%9A%E8%B0%83.png" alt="一般不动的参数"></li>
+<li>配置新生代与老年代在堆结构的占比。<ul>
+<li>默认-XX:NewRatio=2,表示新生代占1，老年代占2，新生代占整个堆的1/3</li>
+<li>可以修改-XX:NewRatio=4,表示新生代占1，老年代占4，新生代占整个堆的1/5</li>
+</ul>
+</li>
+<li>在Hotspot中，Eden空间和另外两个Survivor空间缺省所占的比例是8:1:1</li>
+<li>当然开发人员可以通过选项”-XX:SurvivorRatio”调整这个空间比例。比如-XX:SurvivorRatio=8</li>
+<li>几乎所有的Java对象都是在Eden区域被new出来的。</li>
+<li>绝大部分的Java对象的销毁都在新生代进行了<ul>
+<li>IBM公司的专门研究表明，新生代中80%的对象都是”朝生夕死”</li>
+</ul>
+</li>
+<li>可以使用选项“-Xmn”设置新生代最大内存大小<ul>
+<li>这个参数一般使用默认值就可以了。<br><img src="https://tjiseedu.oss-cn-beijing.aliyuncs.com/%E5%8D%9A%E5%AE%A2/%E6%96%B0%E7%94%9F%E4%BB%A3%E4%B8%8E%E8%80%81%E5%B9%B4%E4%BB%A3%E6%9C%80%E5%90%8E.png" alt="年轻与老年"><h3 id="图解对象的分配过程"><a href="#图解对象的分配过程" class="headerlink" title="图解对象的分配过程"></a>图解对象的分配过程</h3><h4 id="概述-1"><a href="#概述-1" class="headerlink" title="概述"></a>概述</h4>为新对象分配内存是一件非常严谨和复杂的任务，JVM的设计者们不仅需要考虑内存如何分配、在哪里分配等问题，并且由于内存分配算法与内存回收算法密切相关，所以还需要考虑GC执行完毕内存回收是否会在内存空间中产生内存碎片。</li>
+</ul>
+</li>
+<li>1、new的对象先放Eden区，此区有大小限制。</li>
+<li>2、当Eden区的空间填满时，程序又需要创建对象，JVM的垃圾回收器将对Eden区进行垃圾回收（Minor GC） ，将Eden区中的不再被其他对象引用的对象进行销毁。再加载新的对象放到Eden区。</li>
+<li>3、然后将Eden区中的剩余对象移动到Survivor0区。</li>
+<li>4、如果再次触发垃圾回收，此时上次幸存下来的放到Survivor0区的，如果没有被回收，就会放到Survivor1区。</li>
+<li>5、如果再次经历垃圾回收，此时会重新放回Survivor0区，接着再去Survivor区。</li>
+<li>6、啥时候能去养老区呢？可以设置次数。默认是15次<ul>
+<li>可以设置参数:-XX:MaxTenuringThreshold=&lt; N &gt;进行设置</li>
+</ul>
+</li>
+<li>7、在养老区，相对悠闲。当养老区内存不足时，再次触发GC：Major GC，进行养老区的内存清理。</li>
+<li>8、若养老区执行了Major GC之后发现依然无法进行对象保存，就会产生OOM异常<blockquote>
+<p>java.lang.OutOfMemoryError:Java heap space<br><img src="https://tjiseedu.oss-cn-beijing.aliyuncs.com/%E5%8D%9A%E5%AE%A2/%E5%9B%BE%E8%A7%A3%E5%AF%B9%E8%B1%A1%E7%9A%84%E5%88%86%E9%85%8D.png" alt="图解对象的分配"></p>
+</blockquote>
+</li>
+<li>总结： <ul>
+<li>针对Survivor0，Survivor1区的总结：复制之后有交换，谁空谁是to。</li>
+<li>关于垃圾回收：频繁在新生区收集，很少在养老区收集，几乎不再永久区/元空间收集。<br><img src="https://tjiseedu.oss-cn-beijing.aliyuncs.com/%E5%8D%9A%E5%AE%A2/%E5%AF%B9%E8%B1%A1%E5%88%86%E9%85%8D%E7%9A%84%E7%AD%96%E7%95%A5.png" alt="对象的分配策略"><h3 id="Minor-GC、Major-GC与Full-GC"><a href="#Minor-GC、Major-GC与Full-GC" class="headerlink" title="Minor GC、Major GC与Full GC"></a>Minor GC、Major GC与Full GC</h3>JVM在进行GC时，并非每次都对上面三个内存（新生代、老年代：方法区）区域一起回收的，大部分时候回收的都是指新生代。<br>针对Hotspot VM的实现，它里面的GC按照回收区域又分为两大种类型：一种是部分收集（Partial GC），一种是整堆收集（Full GC）</li>
+</ul>
+</li>
+<li>部分收集：不是完整收集整个Java堆的垃圾收集。其中又分为：<ul>
+<li>新生代收集（Minor GC/Young GC）：只是新生代的垃圾收集</li>
+<li>老年代收集（Major GC/Old GC）: 只是老年代的垃圾收集。<ul>
+<li>目前，只有CMS GC会有单独收集老年代的行为</li>
+<li>  <strong>注意，很多时候Major GC会和Full GC混淆使用，需要具体分辨是老年代回收还是整堆回收</strong></li>
+</ul>
+</li>
+<li>混合收集（Mixed GC）：收集整个新生代以及部分老年代的垃圾收集。<ul>
+<li>目前，只有G1 GC会有这种行为。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>整堆收集（Full GC）：收集整个Java堆和方法区的垃圾收集。<h4 id="最简单分代式GC策略的触发条件"><a href="#最简单分代式GC策略的触发条件" class="headerlink" title="最简单分代式GC策略的触发条件"></a>最简单分代式GC策略的触发条件</h4></li>
+<li>年轻代GC（Minor GC）触发机制：<ul>
+<li>当年轻代空间不足时，就会触发Minor GC，这里的年轻代满指的是Eden区满，Survivor满不会引发GC。（每次 Minor GC会清理年轻代的内存）</li>
+<li>因为Java对象大多都具备朝生夕灭的特性，所以Minor GC 非常频繁，一般回收速度也比较快。这一定义既清晰又易于理解。</li>
+<li>Minor GC会引发STW，暂停其它用户线程，等垃圾回收结束，用户线程才恢复运行。<br><img src="https://tjiseedu.oss-cn-beijing.aliyuncs.com/%E5%8D%9A%E5%AE%A2/GC%E8%A7%A6%E5%8F%91%E6%9D%A1%E4%BB%B6.png" alt="GC触发条件"></li>
+<li>老年代GC（Major GC/Full GC）触发机制：<ul>
+<li>指发生在老年代的GC，对象从老年代消失时，我们说“Major GC”或“Full GC”发生了。</li>
+<li>出现了Major GC，经常会伴随至少一次的Minor GC（但非绝对的，在Parallel Scavenge 收集器的收集策略里就直接进行Major GC的策略选择过程）。<ul>
+<li>也就是老年代空间不足时，会先尝试触发Minor GC。如果之后空间还不足，则触发Major GC</li>
+</ul>
+</li>
+<li>Major GC的速度一般会比Minor GC慢10倍以上，STW的时间更长。</li>
+<li>如果Major GC后，内存还不足，就报OOM</li>
+</ul>
+</li>
+<li>Full GC触发机制<br>触发Full GC执行的情况有如下五种：<ul>
+<li>1】 调用System.gc()时，系统建议执行Full GC，但是不必然执行。</li>
+<li>2】老年代空间不足。</li>
+<li>3】方法区空间不足。</li>
+<li>4】通过Minor GC后进入老年代的平均大小大于老年代的可用内存。</li>
+<li>5】有Eden区、Survivor Space0（From Space）区向Survivor Space1（To Space）区复制时，对象大小大于To Space可用内存，则把该对象转存到老年代，且老年代的可用内存小于该对象大小。<br>说明：Full GC是开发或调优中尽量要避免的。这样暂时时间会短一些。<h3 id="堆空间分代思想"><a href="#堆空间分代思想" class="headerlink" title="堆空间分代思想"></a>堆空间分代思想</h3>为什么需要把Java堆分代？不分代就不能正常工作了吗？</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>经研究，不同对象的生命周期不同。70%~99%的对象都是临时对象。</li>
+<li>新生代：有Eden、两块大小相同的Survivor（又称为from/to，s0/s1）构成，to总为空。</li>
+<li>老年代：存放新生代中经历多次GC仍然存活的对象。<br><img src="https://tjiseedu.oss-cn-beijing.aliyuncs.com/%E5%8D%9A%E5%AE%A2/JDK7%E5%A0%86.png" alt="JDk7"></li>
+<li>其实不分代完全可以，分代的唯一理由就是优化GC性能。如果没有分代，那所有对象都在一块，就如同把一个学校的人都关在一个教室。GC的时候要能找到哪些对象没用，这样就会对堆的所有区域进行扫描。而很多时候对象都是朝生夕死的，如果分代的话，把新创建的对象放到某一地方，当GC的时候先把这块存储“朝生夕死”对象的区域进行回收，这样就会腾出很大的空间出来。<br><img src="https://tjiseedu.oss-cn-beijing.aliyuncs.com/%E5%8D%9A%E5%AE%A2/JDK8%E5%A0%86.png" alt="JDK8"><h3 id="内存分配的策略"><a href="#内存分配的策略" class="headerlink" title="内存分配的策略"></a>内存分配的策略</h3>如果对象在Eden出生并经历过一次Minor GC后仍然存活，并且能被Survivor容纳的话，将被移动到Survivor空间中。并将对象年龄设为1.对象在Survivor区中每熬过一次Minor GC，年龄就增加1岁，当它的年龄增加到一定程度（默认为15岁，其实每个JVM、每个GC都有所不同）时，就会被晋升到老年代中。<br>对象晋升到老年代中的年龄阈值，可以通过选项:-XX:MaxTenuringThreshold来设置。<br>针对不同年龄段的对象分配原则如下所示：</li>
+<li>优先分配到Eden</li>
+<li>大对象直接分配到老年代<ul>
+<li>尽量避免程序中出现过多的大对象。</li>
+</ul>
+</li>
+<li>长期存活的对象分配到老年代</li>
+<li>动态对象年龄判断<ul>
+<li>如果Survivor 区中相同年龄的所有对象大小的总和大于Survivor空间的一半，年龄大于或等于该年龄的对象可以直接进入老年代，无需等到MaxTenuringThreshold中要求的年龄。</li>
+</ul>
+</li>
+<li>空间分配担保<ul>
+<li>-XX:HandlePromotionFailure<h3 id="为对象分配内存：TLAB"><a href="#为对象分配内存：TLAB" class="headerlink" title="为对象分配内存：TLAB"></a>为对象分配内存：TLAB</h3>为什么会有TLAB(Thread Local Allocation Buffer)?</li>
+</ul>
+</li>
+<li>堆区是线程共享区域，任何线程都可以访问到堆区中的共享数据</li>
+<li>由于对象实例的创建在JVM中非常频繁，因此在并发环境下从堆区中划分内存空间是线程不安全的</li>
+<li>为避免多个线程操作同一地址，需要使用枷锁等机制，进而影响分配速度。<br>TLAB是什么</li>
+<li>从内存模型而不是垃圾收集的角度，对Eden区域继续进行划分，JVM为每个线程分配一个私有缓存区域，它包含在Eden空间内。</li>
+<li>多线程同时分配内存时，使用TLAB可以避免一系列的非线程安全问题。同时还能够提升内存分配的吞吐量，因此我们可以将这种内存分配方式称之为快速分配策略。<br><img src="https://tjiseedu.oss-cn-beijing.aliyuncs.com/%E5%8D%9A%E5%AE%A2/TLAB.png" alt="TLAB"><br>TLAB再说明</li>
+<li>尽管不是所有的对象实例都能够在TLAB中成功分配内存，但JVM确实是将TLAB作为内存分配的首选。</li>
+<li>在程序中，开发人员可以通过选项”-XX:UserTLAB”设置是否开启TLAB空间</li>
+<li>默认情况下，TLAB空间的内存非常小,仅占整个Eden空间的1%，当然我们也可以通过选项”-XX:TLABWasteTargetPercent”设置TLAB空间所占用Eden空间的百分比大小。</li>
+<li>一旦对象在TLAB空间分配内存失败时，JVM就会尝试着通过使用加锁机制确保数据操作的原子性，从而直接在Eden空间中分配内存<br><img src="https://tjiseedu.oss-cn-beijing.aliyuncs.com/%E5%8D%9A%E5%AE%A2/TLAB%E5%88%86%E9%85%8D%E5%86%85%E5%AD%98.png" alt="TLAB分配内存"></li>
 </ul>
 
         </div>
