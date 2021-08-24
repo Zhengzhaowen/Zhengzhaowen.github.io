@@ -568,7 +568,7 @@
 <li>堆，是GC（Garbage Collection，垃圾收集器）执行垃圾回收的重点区域<br><img src="https://tjiseedu.oss-cn-beijing.aliyuncs.com/%E5%8D%9A%E5%AE%A2/%E5%A0%86%E7%9A%84%E6%A0%B8%E5%BF%83%E6%A6%82%E8%BF%B0.png" alt="堆的核心概述"><h4 id="内存细节"><a href="#内存细节" class="headerlink" title="内存细节"></a>内存细节</h4>现代垃圾收集器大部分都基于分代收集理论设计，堆空间分为：<br><img src="https://tjiseedu.oss-cn-beijing.aliyuncs.com/%E5%8D%9A%E5%AE%A2/%E5%A0%86%E7%9A%84%E5%86%85%E5%AD%98%E7%BB%86%E8%8A%82.png" alt="堆的内存细节"><blockquote>
 <p>JDK 7 的堆内存<br><img src="https://tjiseedu.oss-cn-beijing.aliyuncs.com/%E5%8D%9A%E5%AE%A2/JDK7%E5%A0%86%E5%86%85%E5%AD%98.png" alt="JDK7的堆内存"><br>JDK 8 的堆内存<br><img src="https://tjiseedu.oss-cn-beijing.aliyuncs.com/%E5%8D%9A%E5%AE%A2/JDK8%E5%A0%86%E5%86%85%E5%AD%98.png" alt="JDK8的堆内存"></p>
 </blockquote>
-<h2 id="堆内存的大小与OOM"><a href="#堆内存的大小与OOM" class="headerlink" title="堆内存的大小与OOM"></a>堆内存的大小与OOM</h2></li>
+<h3 id="堆内存的大小与OOM"><a href="#堆内存的大小与OOM" class="headerlink" title="堆内存的大小与OOM"></a>堆内存的大小与OOM</h3></li>
 <li>Java堆区用于存储Java对象实例，那么堆的大小在JVM启动时就已经设定好了，大家可以通过选项”-Xmx”和”-Xms”来进行设置。<ul>
 <li>“-Xms”用于表示堆区的起始内存，等价于-XX:InitialHeapSize</li>
 <li>“-Xmx”用于表示堆区的最大内存，等价于-XX:MaxHeapSize</li>
@@ -686,6 +686,176 @@
 <li>在程序中，开发人员可以通过选项”-XX:UserTLAB”设置是否开启TLAB空间</li>
 <li>默认情况下，TLAB空间的内存非常小,仅占整个Eden空间的1%，当然我们也可以通过选项”-XX:TLABWasteTargetPercent”设置TLAB空间所占用Eden空间的百分比大小。</li>
 <li>一旦对象在TLAB空间分配内存失败时，JVM就会尝试着通过使用加锁机制确保数据操作的原子性，从而直接在Eden空间中分配内存<br><img src="https://tjiseedu.oss-cn-beijing.aliyuncs.com/%E5%8D%9A%E5%AE%A2/TLAB%E5%88%86%E9%85%8D%E5%86%85%E5%AD%98.png" alt="TLAB分配内存"></li>
+</ul>
+<h3 id="小节堆空间的参数设置"><a href="#小节堆空间的参数设置" class="headerlink" title="小节堆空间的参数设置"></a>小节堆空间的参数设置</h3><ul>
+<li><p>-XX:+PrintFlagsInitial:查看所有的参数的默认值。</p>
+</li>
+<li><p>-XX:+PrintFlagsFinal:查看所有的参数的最终值(可能存在修改，不再是初始值)</p>
+</li>
+<li><p>-Xms:初始堆空间内存(默认为物理内存的1/64)</p>
+</li>
+<li><p>-Xmx:最大堆空间内存(默认为物理内存的1/4)</p>
+</li>
+<li><p>-Xmn:设置新生代的大小(初始值及最大值)</p>
+</li>
+<li><p>-XX:NewRatio:配置新生代与老年代在堆结构的占比。</p>
+</li>
+<li><p>-XX:SurvivorRatio:设置新生代中Eden和s0/s1空间的比例</p>
+</li>
+<li><p>-XX:MaxTenuringThreshold:设置新生代垃圾的最大年龄</p>
+</li>
+<li><p>-XX:+PrintGCDetails:输出详细的GC处理日志。</p>
+</li>
+<li><p>-XX:HandlePromotionFailure:是否设置空间分配担保<br>在发生Minor GC之前，虚拟机会检查老年代最大可用的连续空间是否大于新生代所有对象的总空间。</p>
+<ul>
+<li>如果大于，则此次Minor GC是安全的。</li>
+<li>如果小于，则虚拟机会查看-XX:HandlePromotionFailure设置是否允许担保失败<ul>
+<li>如果HandlePromotionFailure=true，那么会继续检查老年代最大可用连续空间是否大于历次晋升到老年代的对象的平均大小。<ul>
+<li>如果大于，则尝试进行一次Minor GC，但这次Minor GC依然是有风险的。</li>
+<li>如果小于，则改为进行一次Full GC。</li>
+</ul>
+</li>
+<li>如果HandlePromotionFailure=false，则改为进行一次Full GC<br>在JDK 6 update24之后，HandlePromotionFailure参数不在会影响到虚拟机的空间分配担保策略，观察OpenJDK中的源码变化，虽然源码中定义了HandlePromotionFailure参数，但是在代码中已经不会再使用它。JDK6 update24之后的规则会变为只要老年代的连续空间大于新生代对象总大小或者历次晋升的平均大小就会进行Minor GC，否则进行Full GC。<h3 id="堆是分配对象存储的唯一选择吗？"><a href="#堆是分配对象存储的唯一选择吗？" class="headerlink" title="堆是分配对象存储的唯一选择吗？"></a>堆是分配对象存储的唯一选择吗？</h3><h4 id="逃逸分析的概述"><a href="#逃逸分析的概述" class="headerlink" title="逃逸分析的概述"></a>逃逸分析的概述</h4>在《深入理解Java虚拟机》中关于Java堆内存有这样一段描述：<br>对着JIT编译期的发展与逃逸分析技术逐渐成熟，栈上分配、标量替换优化技术将会导致一些微妙的变化，所有的对象都分配到堆上也渐渐变得不那么“绝对了”。<br>在Java虚拟机中，对象是在Java堆中分配内存的，这是一个普遍的常识。但是，有一种特殊的情况，那就是如果经过逃逸分析(Escape Analysis)后发现，一个对象并没有逃逸出方法的话，那么可能被优化成栈上分配。这样无需再堆上分配内存，也无须进行垃圾回收了。这也是最常见的堆外存储技术。<br>此外，前面提到的基于OpenJDK深度定制的TaoBaoVM，其中创新的GCIH（GC invisible heap）技术实现off-heap，将生命周期较长的Java对象从heap中移至heap外，并且GC不能管理GCIH内部的Java对象，以此达到降低GC的回收频率和提升GC的回收效率的目的。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>如何将堆上的对象分配到栈，需要使用逃逸分析手段。</p>
+</li>
+<li><p>这是一种可以有效减少Java程序中同步负载和内存堆分配压力的跨函数全局数据流分析算法。</p>
+</li>
+<li><p>通过逃逸分析，Java Hots 编译器能够分析出一个新的对象的引用的使用范围从而决定是否要将这个对象分配到堆上。</p>
+</li>
+<li><p>逃逸分析的基本行为就是分析对象动态作用域：</p>
+<ul>
+<li>当一个对象在方法中被定义后，对象只在方法内部使用，则认为没有发生逃逸</li>
+<li>当一个对象在方法中被定义后，它被外部方法所引用，则认为发生了逃逸。例如作为调用参数传递到其他地方中。<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">my_method</span><span class="params">()</span></span>&#123;</span><br><span class="line">      String s = <span class="keyword">new</span> String();</span><br><span class="line">      </span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+没有发生逃逸的对象，则可以分配到栈上，随着方法执行的结束，栈空间就被移除。<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> StringBuffer <span class="title">createStringBuffer</span><span class="params">(String s1,String s2)</span></span>&#123;</span><br><span class="line">      StringBuffer sb =<span class="keyword">new</span> StringBuffer();</span><br><span class="line">      sb.append(s1);</span><br><span class="line">      sb.append(s2);</span><br><span class="line">      <span class="keyword">return</span> sb;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+上述代码如果想要StringBuffer sb不逃逸出方法，可以这样写<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> String <span class="title">createString</span><span class="params">(String s1,String s2)</span></span>&#123;</span><br><span class="line">    StringBuffer sb =<span class="keyword">new</span> StringBuffer();</span><br><span class="line">    sb.append(s1);</span><br><span class="line">    sb.append(s2);</span><br><span class="line">    <span class="keyword">return</span> sb.toString();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"> </span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@program</span>: JVMDemo</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@description</span>: test</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span>: 郑朝文</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@create</span>: 2021-08-24 10:18</span></span><br><span class="line"><span class="comment"> **/</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">EscapeAnalysis</span> </span>&#123;</span><br><span class="line">    <span class="keyword">public</span>  EscapeAnalysis obj;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 方法返回EscapeAnalysis对象，发生了逃逸</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> EscapeAnalysis <span class="title">getInstance</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> obj== <span class="keyword">null</span> ? <span class="keyword">new</span> EscapeAnalysis():obj;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 为成员赋值，发生了逃逸</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setObj</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.obj=<span class="keyword">new</span> EscapeAnalysis();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 对象的作用域仅在当前方法中有效，没有发生逃逸。</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">useEscapeAnalysis</span><span class="params">()</span></span>&#123;</span><br><span class="line">        EscapeAnalysis e =<span class="keyword">new</span> EscapeAnalysis();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 引用成员变量，发生了逃逸</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">useEscapeAnalysis1</span><span class="params">()</span></span>&#123;</span><br><span class="line">        EscapeAnalysis e=getInstance();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+参数设置：</li>
+</ul>
+</li>
+<li><p>在JDK 6u23版本之后，Hots中默认就已经开启了逃逸分析。</p>
+</li>
+<li><p>如果使用的是较早的版本，开发人员则可以通过：</p>
+<ul>
+<li>选项“-XX:+DoEscapeAnalysis”显示的开启逃逸分析。</li>
+<li>通过选项“-XX:+PrintEscapeAnalysis”查看逃逸分析的筛选结果。<blockquote>
+<p>结论<br>开发中能使用局部变量的，就不要再方法外定义。</p>
+</blockquote>
+</li>
+</ul>
+</li>
+</ul>
+<h4 id="代码优化"><a href="#代码优化" class="headerlink" title="代码优化"></a>代码优化</h4><p>使用逃逸分析，编译期可以对代码做如下优化：</p>
+<ul>
+<li>一、栈上分配。将堆分配转化为栈分配。如果一个对象在子程序中被分配，要使指向该对象的指针永远不会逃逸，对象可能是栈分配的候选，而不是堆分配。</li>
+<li>二、同步省略。如果一个对象被发现只能从一个线程被访问到，那么对于这个对象的操作可以考虑不同步。</li>
+<li>三、分离对象或变量替换。有的对象可能不需要作为一个连续的内存结构存在也可以被访问到，那么对象的部分（或全部）可以不存储在内存，而是存储在CPU寄存器中。</li>
+<li>JIT编译器在编译期间根据逃逸分析的结果，发现如果一个对象并没有逃逸出方法的话，就可能被优化成栈上分配。分配完成后，继续在调用栈内执行，最后线程结束，栈空间被回收，局部变量对象也被回收。这样就无须进行垃圾回收了。<h5 id="栈上分配"><a href="#栈上分配" class="headerlink" title="栈上分配"></a>栈上分配</h5></li>
+<li>常见的栈上分配的场景<ul>
+<li>在逃逸分析中，已经说明了。分别是给成员变量赋值、方法返回值、实例引用传递。<h5 id="同步省略"><a href="#同步省略" class="headerlink" title="同步省略"></a>同步省略</h5></li>
+</ul>
+</li>
+<li>线程同步的代价是相当高的，同步的后果是降低并发性和性能。</li>
+<li>在动态编译同步块的时候，JIT编译器可以借助逃逸分析来判断同步块所使用的锁对象是否只能够被一个线程访问而没有被发布到其他线程。如果没有，那么JIT编译器在编译这个同步块的时候就会取消对这部分代码的同步。这样就能大大提高并发性和性能。这个取消同步的过程就叫同步省略，也叫锁消除。<br>如下代码<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">f</span><span class="params">()</span></span>&#123;</span><br><span class="line">      Object h = <span class="keyword">new</span> Object();</span><br><span class="line">      <span class="keyword">synchronized</span> (h)&#123;</span><br><span class="line">          System.out.println(h);</span><br><span class="line">      &#125;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+代码中的h这个对象进行枷锁，但是h对象的生命周期只在f()方法中，并不会被其他线程所访问到，所以在JIT编译阶段就会被优化掉。优化成：<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">f</span><span class="params">()</span></span>&#123;</span><br><span class="line">    Object h = <span class="keyword">new</span> Object();</span><br><span class="line">    </span><br><span class="line">    System.out.println(h);</span><br><span class="line">    </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h5 id="标量替换"><a href="#标量替换" class="headerlink" title="标量替换"></a>标量替换</h5>标量（Scalar）是指一个无法再被分解成更小的数据的数据。Java中的原始数据类型就是标量。<br>相对的，那些还可以分解的数据叫做聚合量（Aggregate），Java中的对象就是聚合量，因为他可以分解成其他聚合量和标量。<br>在JIT阶段，如果经过逃逸分析，发现一个对象不会被外界访问的话，那么经过JIT优化，就会把这个对象拆解成若干个其中包含的若干个 成员变量来代替。这个过程就是标量替换。<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ScalarTest</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        alloc();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">alloc</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        Point point = <span class="keyword">new</span> Point(<span class="number">1</span>, <span class="number">2</span>);</span><br><span class="line">        System.out.println(<span class="string">&quot;point.x=&quot;</span> + point.x + <span class="string">&quot;;point.y=&quot;</span> + point.y);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Point</span></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">int</span> x;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">int</span> y;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+以上代码，经过标量替换后，就会变成<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">alloc</span><span class="params">()</span> </span>&#123;</span><br><span class="line">       <span class="keyword">int</span> x  = <span class="number">1</span> ;</span><br><span class="line">       <span class="keyword">int</span> y =<span class="number">2</span> ;</span><br><span class="line">       System.out.println(<span class="string">&quot;point.x=&quot;</span> + x + <span class="string">&quot;;point.y=&quot;</span> + y);</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+可以看到，Pint这个聚合量经过逃逸分析后，发现他并没有逃逸，就被替换成两个聚合量。那么标量替换有什么好处呢？就是可以大大减少堆内存的占用。因为一旦不需要创建对象了，那么就不在需要分配堆内存了。<br>变量替换为线上分配提供了很好的基础。<br>变量替换的参数设置：<blockquote>
+<p>参数-XX:+EliminateAllocations:开启了标量替换（默认打开），允许对象打散在栈上。<br>代码举例</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 标量替换测试</span></span><br><span class="line"><span class="comment"> * -Xmx100m -Xms100m -XX:+DoEscapeAnalysis -XX:+PrintGC -XX:-EliminateAllocations</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ScalarReplace</span> </span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">User</span> </span>&#123;</span><br><span class="line">        <span class="keyword">public</span> <span class="keyword">int</span> id;</span><br><span class="line">        <span class="keyword">public</span> String name;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">alloc</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        User u = <span class="keyword">new</span> User(); <span class="comment">//未发生逃逸</span></span><br><span class="line">        u.id = <span class="number">5</span>;</span><br><span class="line">        u.name = <span class="string">&quot;www.baidu.com&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">long</span> start = System.currentTimeMillis();</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">10000000</span>; i++) &#123;</span><br><span class="line">            alloc();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">long</span> end = System.currentTimeMillis();</span><br><span class="line">        System.out.println(<span class="string">&quot;花费的时间为： &quot;</span> + (end - start) + <span class="string">&quot; ms&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+没有使用标量替换<br>参数设置为：<blockquote>
+<p>-Xmx100m -Xms100m -XX:+DoEscapeAnalysis -XX:+PrintGC -XX:-EliminateAllocations</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">[GC (Allocation Failure)  25600K-&gt;960K(98304K), <span class="number">0.0012864</span> secs]</span><br><span class="line">[GC (Allocation Failure)  26560K-&gt;976K(98304K), <span class="number">0.0007606</span> secs]</span><br><span class="line">[GC (Allocation Failure)  26576K-&gt;872K(98304K), <span class="number">0.0006618</span> secs]</span><br><span class="line">[GC (Allocation Failure)  26472K-&gt;856K(98304K), <span class="number">0.0006887</span> secs]</span><br><span class="line">[GC (Allocation Failure)  26456K-&gt;872K(98304K), <span class="number">0.0006046</span> secs]</span><br><span class="line">[GC (Allocation Failure)  26472K-&gt;904K(101376K), <span class="number">0.0007515</span> secs]</span><br><span class="line">[GC (Allocation Failure)  32648K-&gt;924K(100864K), <span class="number">0.0007253</span> secs]</span><br><span class="line">[GC (Allocation Failure)  32668K-&gt;1020K(100864K), <span class="number">0.0003566</span> secs]</span><br><span class="line">花费的时间为： <span class="number">106</span> ms</span><br></pre></td></tr></table></figure>
+开启标量替换<blockquote>
+<p>-Xmx100m -Xms100m -XX:+DoEscapeAnalysis -XX:+PrintGC -XX:+EliminateAllocations</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">花费的时间为： <span class="number">5</span> ms</span><br></pre></td></tr></table></figure>
+没有GC，消耗时间为5ms</li>
+</ul>
+<blockquote>
+<p>总结<br>上述代码在主函数中进行了1亿次alloc。调用进行对象创建，由于User对象实例需要占据约16字节的空间，因此累计分配空间达到将近1.5GB。如果堆空间小于这个值，就必然会发生GC。使用下面参数运行上述代码：<br>-server -Xmx100m -Xms100m -XX:+DoEscapeAnalysis -XX:+PrintGC -XX:+EliminateAllocations<br>这里使用参数如下：</p>
+</blockquote>
+<ul>
+<li><p>参数-server：启动server模式，因为在server模式下，才可以启用逃逸分析。</p>
+</li>
+<li><p>参数-XX:+DoEscapeAnalysis:启用逃逸分析</p>
+</li>
+<li><p>参数-Xmx10m:指定了堆空间最大为10MB</p>
+</li>
+<li><p>参数-XX:+PrintGC:将打印GC日志。</p>
+</li>
+<li><p>参数-XX:+PrintGC -XX:+EliminateAllocations:开启了变量替换（默认打开），允许对象打散分配在栈上，比如对象拥有id和name两个字段，那个这两个字段将会被视为两个独立的局部变量进行分配</p>
+<h4 id="逃逸分析并不成熟"><a href="#逃逸分析并不成熟" class="headerlink" title="逃逸分析并不成熟"></a>逃逸分析并不成熟</h4></li>
+<li><p>关于逃逸分析的论文在1999年就已经发表了，但直到JDK1.6才有实现，而且这项技术到如今也并不是十分成熟的。</p>
+</li>
+<li><p>其根本原因就是无法保证逃逸分析的性能消耗一定能高于他的消耗。虽然经过逃逸分析可以做标量替换、栈上分配、和锁消除。但是逃逸分析自身也是需要进行一系列复杂的分析的，这其实也是一个相对耗时的过程。一个极端的例子，就是经过逃逸分析之后，发现没有一个对象是不逃逸的。那这个逃逸分析的过程就白白浪费掉了。</p>
+</li>
+<li><p>虽然这项技术并不十分成熟，但是它也是即时编译器优化技术中一个十分重要的手段。注意到有一些观点，认为通过逃逸分析，JVM会在栈上分配那些不会逃逸的对象，这在理论上是可行的，但是取决于JVM设计者的选择</p>
+</li>
+<li><p>据我所知，Oracle Hotspot JVM中并未这么做，这一点在逃逸分析相关的文档里已经说明，所以可以明确所有的对象实例都是创建在堆上。</p>
+</li>
+<li><p>Oracle Hotspot JVM是通过标量替换实现逃逸分析的</p>
+</li>
+<li><p>目前很多书籍还是基于JDK7以前的版本，JDK已经发生了很大变化，intern字符串的缓存和静态变量曾经都被分配在永久代上，而永久代已经被元数据区取代。但是intern字符串缓存和静态变量并不是被转移到元数据区，而是直接在堆上分配，所以这一点同样符合前面一点的结论：对象实例都是分配在堆上。</p>
+<h2 id="方法区"><a href="#方法区" class="headerlink" title="方法区"></a>方法区</h2><h3 id="栈、堆、方法区的交互关系"><a href="#栈、堆、方法区的交互关系" class="headerlink" title="栈、堆、方法区的交互关系"></a>栈、堆、方法区的交互关系</h3><p>运行时数据区的结构图<br><img src="https://tjiseedu.oss-cn-beijing.aliyuncs.com/%E5%8D%9A%E5%AE%A2/%E6%96%B9%E6%B3%95%E5%8C%BA%E4%B9%8B%E8%BF%90%E8%A1%8C%E6%97%B6%E6%95%B0%E6%8D%AE%E5%8C%BA%E7%BB%93%E6%9E%84%E5%9B%BE.png" alt="运行时数据区的结构图"><br>从线程共享与否的角度看<br><img src="https://tjiseedu.oss-cn-beijing.aliyuncs.com/%E5%8D%9A%E5%AE%A2/%E4%BB%8E%E7%BA%BF%E7%A8%8B%E5%88%86%E9%85%8D%E7%9A%84%E8%A7%92%E5%BA%A6%E7%9C%8B.png" alt="从线程共享与否的角度看"><br>栈、堆、方法区的交互关系<br><img src="https://tjiseedu.oss-cn-beijing.aliyuncs.com/%E5%8D%9A%E5%AE%A2/%E5%A0%86%E3%80%81%E6%A0%88%E3%80%81%E6%96%B9%E6%B3%95%E5%8C%BA%E7%9A%84%E4%BA%A4%E4%BA%92%E5%85%B3%E7%B3%BB.png" alt="栈、堆、方法区的交互关系"></p>
+<h3 id="方法区的理解"><a href="#方法区的理解" class="headerlink" title="方法区的理解"></a>方法区的理解</h3><p>官方文档</p>
+<blockquote>
+<p>The Java Virtual Machine has a method area that is shared among all Java Virtual Machine threads. The method area is analogous to the storage area for compiled code of a conventional language or analogous to the “text” segment in an operating system process. It stores per-class structures such as the run-time constant pool, field and method data, and the code for methods and constructors, including the special methods (§2.9) used in class and instance initialization and interface initialization.<br>The method area is created on virtual machine start-up. Although the method area is logically part of the heap, simple implementations may choose not to either garbage collect or compact it. This specification does not mandate the location of the method area or the policies used to manage compiled code. The method area may be of a fixed size or may be expanded as required by the computation and may be contracted if a larger method area becomes unnecessary. The memory for the method area does not need to be contiguous.<br>A Java Virtual Machine implementation may provide the programmer or the user control over the initial size of the method area, as well as, in the case of a varying-size method area, control over the maximum and minimum method area size.<br>The following exceptional condition is associated with the method area:<br>If memory in the method area cannot be made available to satisfy an allocation request, the Java Virtual Machine throws an OutOfMemoryError.</p>
+</blockquote>
+<p><a target="_blank" rel="noopener" href="https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-2.html#jvms-2.5.4">访问官网</a></p>
+<h4 id="方法区在哪里？"><a href="#方法区在哪里？" class="headerlink" title="方法区在哪里？"></a>方法区在哪里？</h4><p>《Java虚拟机规范》中明确说明：“尽管所有的方法区在逻辑上是属于堆的一部分，但一些简单的实现可能不会去选择去进行垃圾收集或者进行压缩。”但对于HotspotJVM而言，方法区还有一个别名叫做Non-Heap（非堆），目的就是要和堆分开。<br>所以，方法区看作是一块独立于Java堆的内存空间。<br><img src="https://tjiseedu.oss-cn-beijing.aliyuncs.com/%E5%8D%9A%E5%AE%A2/%E8%BF%90%E8%A1%8C%E6%97%B6%E6%95%B0%E6%8D%AE%E5%8C%BA2.png" alt="运行时数据区"></p>
+<h4 id="方法区的基本理解"><a href="#方法区的基本理解" class="headerlink" title="方法区的基本理解"></a>方法区的基本理解</h4></li>
+<li><p>方法区（Method Area）与Java堆一样，是各个线程共享的内存区域。</p>
+</li>
+<li><p>方法区在JVM启动的时候别创建，并且它的实际物理内存空间中和Java堆区一样都可以是不连续的。</p>
+</li>
+<li><p>方法区的大小，跟堆空间一样，可以选择固定大小或者可扩展。</p>
+</li>
+<li><p>方法区的大小决定了系统可以保存多少个类，如果系统定义了太多的类，导致方法区溢出，虚拟机同样会抛出内存溢出的错误：java.lang.OutofMemoryError:PermGen space或者java.lang.OutofMemoryError:Metaspace</p>
+<ul>
+<li>加载大量的第三方的jar包：Tomcat部署的工程过多（30~50个），大量动态的生成反射类。</li>
+</ul>
+</li>
+<li><p>关闭JVM就会释放这个区域的内存</p>
+<h4 id="Hotsp中方法区的演进"><a href="#Hotsp中方法区的演进" class="headerlink" title="Hotsp中方法区的演进"></a>Hotsp中方法区的演进</h4></li>
+<li><p>在jdk7以前，习惯上把方法区，成为永久代。Jdk8开始，使用元空间取代了永久代。</p>
+</li>
+<li><p>本质上，方法区和永久代并不等价。仅是对Hotspot而言的。《Java虚拟机规范》对如何实现方法区，不做统一要求。例如：BEA Jrockit/IBM J9 中不存在永久代的概念。</p>
+<ul>
+<li>现在看来，当年使用永久代，不是好的idea。导致Java程序更容易OOM（超过-XX:MaxPermSize上限）<br><img src="https://tjiseedu.oss-cn-beijing.aliyuncs.com/%E5%8D%9A%E5%AE%A2/%E6%96%B9%E6%B3%95%E5%8C%BA%E7%9A%84%E6%A6%82%E8%BF%B0.png" alt="方法区概述"></li>
+</ul>
+</li>
+<li><p>而到了JDK 8 ，终于完全废弃了永久代的概念，改用与JRockit、J9一样本地内存中实现的元空间(Metaspace)来代替<br><img src="https://tjiseedu.oss-cn-beijing.aliyuncs.com/%E5%8D%9A%E5%AE%A2/Hotspo%E6%96%B9%E6%B3%95%E5%8C%BA%E7%9A%84%E6%BC%94%E8%BF%9B.png" alt="Hotsp中方法区的演进"></p>
+</li>
+<li><p>元空间的本质和永久代类似，都是对JVM规范中方法区的实现。不过元空间与永久代最大的区别在于：元空间不在虚拟机设置的内存中，而是使用本地内存</p>
+</li>
+<li><p>永久代、元空间二者并不只是名字变了，内部结构也调整了。</p>
+</li>
+<li><p>根据《Java虚拟机规范》的规定，如果方法区无法满足新的内存分配需求时，将抛出OOM异常。</p>
+<h3 id="设置方法区大小与OOM"><a href="#设置方法区大小与OOM" class="headerlink" title="设置方法区大小与OOM"></a>设置方法区大小与OOM</h3><h4 id="设置方法区大小"><a href="#设置方法区大小" class="headerlink" title="设置方法区大小"></a>设置方法区大小</h4></li>
+<li><p>方法区的大小不必是固定的，JVM可以根据应用的需要动态调整。</p>
+</li>
+<li><p>jdk7及以前：</p>
+<ul>
+<li>通过-XX:PermSize来设置永久代初始分配空间。默认值是20.75M</li>
+<li>-XX:MaxPermSize来设定永久代最大可分配空间。32为机器默认是64M，64位机器模式是82M</li>
+<li>当JVM加载的类信息容量超过这个值，会报异常OutOfMemoryError:PermGen space.</li>
+</ul>
+</li>
+<li><p>jdk8及以后：</p>
+<ul>
+<li>元数据区大小可以使用参数-XX:MetaspaceSize和-XX:MaxMetaSpaceSize指定，替代上述原有的两个参数。</li>
+<li>默认值依赖于平台。windows下，-XX:MetaspaceSize是21M，-XX:MaxMetaspaceSize的值是-1，即没有限制。</li>
+<li>与永久代不同，如果不指定大小，默认情况下，虚拟机会耗尽所有的可用系统内存。如果元数据区发生溢出，虚拟机一样会抛出OutOfMemoryError:Metaspace</li>
+<li>-XX:MetaspaceSize:设置初始的元空间大小。对于一个64位的服务器端JVM来说，其默认的-XX:MetaspaceSize值为12MB。这就是初始的高水位线，一旦触及这个水位线，Full GC将会被触发并卸载没用的类（即这些类对应的类加载器不在存活），然后这个高水位线将会重置。新的高水位线的值取决于GC释放了多少元空间。如果释放的空间不足，那么在不超过MaxMetaspaceSize时，适当提高该值。如果释放空间过多，则适当降低该值。</li>
+<li>如果初始化的高水位线设置过低，上述高水位线调整情况或发生很多次。通过垃圾回收器的日志可以观察Full GC多次调用。为了避免频繁GC，建议将-XX:MetaspaceSize设置一个相对高的值。</li>
+</ul>
+</li>
 </ul>
 
         </div>
